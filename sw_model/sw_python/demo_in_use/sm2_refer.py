@@ -14,6 +14,11 @@ import collections
 import hashlib
 import random
 
+#打印等级
+INFO  = 3
+DEBUG = 2
+ERROR = 1
+
 #椭圆曲线
 EllipticCurve = collections.namedtuple('EllipticCurve', 'name p a b g n h')
 
@@ -146,8 +151,8 @@ def cood_trans(jacob_point):
     x,y,z = jacob_point
     z2 = z ** 2 % curve.p
     z3 = z2 * z % curve.p
-    # print('Debug: z2=%x\n'%z2)
-    # print('Debug: z3=%x\n'%z3)
+    # debug_print('Debug: z2=%x\n'%z2)
+    # debug_print('Debug: z3=%x\n'%z3)
 
     result_x = x * inverse_mod(z2, curve.p) % curve.p # x/(z^2)
     result_y = y * inverse_mod(z3, curve.p) % curve.p # y/(z^3)
@@ -219,54 +224,54 @@ def point_double_jacob(point1):
 
     x1 = (x0 - t1) % curve.p#x0 -  z0*z0
     y1 = (x0 + t1) % curve.p#x0 +  z0*z0
-    print('x1=%x\n'%x1)
-    print('y1=%x\n'%y1)
+    debug_print('x1=%x\n'%x1)
+    debug_print('y1=%x\n'%y1)
 
     y1 = (y1 * x1) % curve.p#(x0 - z0*z0)(x0 + z0*z0)
     t0 = (y0 * y0) % curve.p#y0 * y0
     z1 = (y0 * z0) % curve.p#y0z0
-    print('y1=%x\n'%y1)
-    print('t0=%x\n'%t0)
-    print('z1=%x\n'%z1)
+    debug_print('y1=%x\n'%y1)
+    debug_print('t0=%x\n'%t0)
+    debug_print('z1=%x\n'%z1)
 
     t0 = (t0 + t0) % curve.p#2y0^2
     t2 = (y1 + y1) % curve.p#2(x0 - z0*z0)(x0 + z0*z0)
-    print('t0=%x\n'%t0)
-    print('t2=%x\n'%t2)
+    debug_print('t0=%x\n'%t0)
+    debug_print('t2=%x\n'%t2)
 
     z1 = (z1 + z1) % curve.p#z=2y0z0
     y1 = (y1 + t2) % curve.p#3(x0 - z0*z0)(x0 + z0*z0)
-    print('z1=%x\n'%z1)
-    print('y1=%x\n'%y1)
+    debug_print('z1=%x\n'%z1)
+    debug_print('y1=%x\n'%y1)
 
     t2 = (y1 * y1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2
     t1 = (t0 * t0) % curve.p#4y0^4
     t0 = (t0 * x0) % curve.p#2y0^2 ·x0
-    print('t2=%x\n'%t2)
-    print('t1=%x\n'%t1)
-    print('t0=%x\n'%t0)
+    debug_print('t2=%x\n'%t2)
+    debug_print('t1=%x\n'%t1)
+    debug_print('t0=%x\n'%t0)
 
     t0 = (t0 + t0) % curve.p#4y0^2 ·x0
-    print('t0=%x\n'%t0)
+    debug_print('t0=%x\n'%t0)
     x1 = (t0 + t0) % curve.p#8y0^2 ·x0
-    print('x1=%x\n'%x1)
+    debug_print('x1=%x\n'%x1)
     x1 = (t2 - x1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
-    print('x1=%x\n'%x1)
+    debug_print('x1=%x\n'%x1)
 
     t1 = (t1 + t1) % curve.p#8y0^4
     t0 = (t0 - x1) % curve.p#4y0^2 ·x0 - (3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
-    print('t1=%x\n'%t1)
-    print('t0=%x\n'%t0)
+    debug_print('t1=%x\n'%t1)
+    debug_print('t0=%x\n'%t0)
 
     y1 = (y1 * t0) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1)
-    print('y1=%x\n'%y1)
+    debug_print('y1=%x\n'%y1)
     y1 = (y1 - t1) % curve.p# (3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1) - 8y0^4
-    print('y1=%x\n'%y1)
+    debug_print('y1=%x\n'%y1)
 
     t1 = z1*z1 % curve.p
-    print('t1=%x\n'%t1)
+    debug_print('t1=%x\n'%t1)
     t2 = t1*z1 % curve.p
-    print('t2=%x\n'%t2)
+    debug_print('t2=%x\n'%t2)
 
     return (x1,y1,z1)
 
@@ -304,51 +309,51 @@ def point_add_jacob(point1_jacob,point2):
 
     t2 = z0 * z0 % curve.p # z0^2
     t0 = z0 * y1 % curve.p # z0y1
-    print('t2=%x\n'%t2)
-    print('t0=%x\n'%t0)
+    debug_print('t2=%x\n'%t2)
+    debug_print('t0=%x\n'%t0)
 
     t1 = t2 * t0 % curve.p # z0^3 y1
     z2 = x1 * t2 % curve.p # x1z0^2
-    print('t1=%x\n'%t1)
-    print('z2=%x\n'%z2)
+    debug_print('t1=%x\n'%t1)
+    debug_print('z2=%x\n'%z2)
 
     t0 = (z2 - x0) % curve.p # X1Z0^2 – X0
     t1 = (t1 - y0) % curve.p # z0^3 *y1 - y0
-    print('t0=%x\n'%t0)
-    print('t1=%x\n'%t1)
+    debug_print('t0=%x\n'%t0)
+    debug_print('t1=%x\n'%t1)
 
     z2 = t0 * z0 % curve.p # Az0
     t2 = t0 * t0 % curve.p # A^2
-    print('z2=%x\n'%z2)
-    print('t2=%x\n'%t2)
+    debug_print('z2=%x\n'%z2)
+    debug_print('t2=%x\n'%t2)
 
     y2 = t0 * t2 % curve.p # A^3
     t2 = t2 * x0 % curve.p # x0A^2
     x2 = t1 * t1 % curve.p # B^2
-    print('y2=%x\n'%y2)
-    print('t2=%x\n'%t2)
-    print('x2=%x\n'%x2)
+    debug_print('y2=%x\n'%y2)
+    debug_print('t2=%x\n'%t2)
+    debug_print('x2=%x\n'%x2)
 
     x2 = (x2 - y2) % curve.p # B^2 - A^3
     t0 = t2 + t2 % curve.p # 2x0A^2
-    print('x2=%x\n'%x2)
-    print('t0=%x\n'%t0)
+    debug_print('x2=%x\n'%x2)
+    debug_print('t0=%x\n'%t0)
 
     x2 = (x2 - t0) % curve.p # B^2 - A^3 - 2x0A^2
-    print('x2=%x\n'%x2)
+    debug_print('x2=%x\n'%x2)
  
     t2 = (t2 - x2) % curve.p # x0A^2 - x2
-    print('t2=%x\n'%t2)
+    debug_print('t2=%x\n'%t2)
 
     t1 = t1 * t2 % curve.p # B (x0A^2 - x2)
     y2 = y0 * y2 % curve.p # y0A^3
     t2 = z2 * z2 % curve.p # z2^2 
-    print('t1=%x\n'%t1)
-    print('t2=%x\n'%t2)
-    print('y2=%x\n'%y2)
+    debug_print('t1=%x\n'%t1)
+    debug_print('t2=%x\n'%t2)
+    debug_print('y2=%x\n'%y2)
 
     y2 = (t1 - y2) % curve.p # B (x0A^2 - x2) - y0A^3
-    print('y2=%x\n'%y2)
+    debug_print('y2=%x\n'%y2)
 
     return (x2,y2,z2)
 
@@ -397,6 +402,9 @@ def scalar_mult(k, point,jacob = 0):
     
     return result
 
+def debug_print(string,log_level = INFO):
+    if log_level <= DBG_PRINT_LEVEL:
+        print(string)
 
 #Python 主函数
 #Demo SM2_MP 运行SM2标准示例曲线·点乘
@@ -405,59 +413,62 @@ def scalar_mult(k, point,jacob = 0):
 #Demo SM2_INT_TEST 内部测试
 
 if __name__ == "__main__":
+    #设定打印等级
+    DBG_PRINT_LEVEL = INFO
+
     #选择 Demo
     # demo = 'SM2_MP'
-    demo = 'SM2_MP_JACOB'
-    # demo = 'SM2_MP_COM'
+    # demo = 'SM2_MP_JACOB'
+    demo = 'SM2_MP_COM'
     # demo = 'SM2_INT_TEST'
-    print('Select demo {}'.format(demo))
+    debug_print('Select demo {}'.format(demo))
 
     #选择曲线
     curve = sm2_curve_p256
-    print('Select curve {}'.format(curve.name))
+    debug_print('Select curve {}'.format(curve.name))
 
     #检查曲线参数：基点是否位于曲线上
     is_on_curve(curve.g)
-    print('Pass: G is on the curve.')
+    debug_print('Pass: G is on the curve.')
 
 
     if demo == 'SM2_MP':
         #k = 0x4C62EEFD_6ECFC2B9_5B92FD6C_3D957514_8AFA1742_5546D490_18E5388D_49DD7B4F
         k = 0x59276E27_D506861A_16680F3A_D9C02DCC_EF3CC1FA_3CDBE4CE_6D54B80D_EAC1BC21
         result = scalar_mult(k,curve.g)
-        print('Run demo {}'.format(demo))
-        print('Result:(%X,%x)'%(result[0],result[1]))
+        debug_print('Run demo {}'.format(demo))
+        debug_print('Result:(%X,%x)'%(result[0],result[1]))
         if (result[0] == 0x04EBFC71_8E8D1798_62043226_8E77FEB6_415E2EDE_0E073C0F_4F640ECD_2E149A73 \
             and result[1] == 0xE858F9D8_1E5430A5_7B36DAAB_8F950A3C_64E6EE6A_63094D99_283AFF76_7E124DF0):
-            print('Result Pass!')
+            debug_print('Result Pass!')
         else:
-            print('Result Fail!')
+            debug_print('Result Fail!')
 
 
     elif demo == 'SM2_MP_JACOB':
         k = 0x59276E27_D506861A_16680F3A_D9C02DCC_EF3CC1FA_3CDBE4CE_6D54B80D_EAC1BC21
         result = scalar_mult(k,curve.g,jacob=1)
-        print('Run demo {}'.format(demo))
-        print('Result:(%X,%x)'%(result[0],result[1]))
+        debug_print('Run demo {}'.format(demo))
+        debug_print('Result:(%X,%x)'%(result[0],result[1]))
         if (result[0] == 0x04EBFC71_8E8D1798_62043226_8E77FEB6_415E2EDE_0E073C0F_4F640ECD_2E149A73 \
             and result[1] == 0xE858F9D8_1E5430A5_7B36DAAB_8F950A3C_64E6EE6A_63094D99_283AFF76_7E124DF0):
-            print('Result Pass!')
+            debug_print('Result Pass!')
         else:
-            print('Result Fail!')
+            debug_print('Result Fail!')
 
 
     elif demo == 'SM2_MP_COM':
-        k = 87
+        k = 3
         result = scalar_mult(k,curve.g,jacob=0)
         result_j = scalar_mult(k,curve.g,jacob=1)
-        print('Run demo {}'.format(demo))
-        print('Result:(%X,%x)'%(result[0],result[1]))
-        print('Result_Jacob:(%X,%x)'%(result_j[0],result_j[1]))
+        debug_print('Run demo {}'.format(demo))
+        debug_print('Result:(%X,%x)'%(result[0],result[1]))
+        debug_print('Result_Jacob:(%X,%x)'%(result_j[0],result_j[1]))
         if (result[0] == result_j[0] \
             and result[1] == result_j[1]):
-            print('Test Pass!')
+            debug_print('Test Pass!')
         else:
-            print('Test Fail!')
+            debug_print('Test Fail!')
 
 
     elif demo == 'SM2_INT_TEST':
@@ -471,14 +482,14 @@ if __name__ == "__main__":
         # result_j = point_add_jacob(result_j,curve.g)#7P
         result_j = cood_trans(result_j)
 
-        print('Run demo {}'.format(demo))
-        print('Result:(%X,%x)'%(result[0],result[1]))
-        print('Result_Jacob:(%X,%x)'%(result_j[0],result_j[1]))
+        debug_print('Run demo {}'.format(demo))
+        debug_print('Result:(%X,%x)'%(result[0],result[1]))
+        debug_print('Result_Jacob:(%X,%x)'%(result_j[0],result_j[1]))
         if (result[0] == result_j[0] \
             and result[1] == result_j[1]):
-            print('Test Pass!')
+            debug_print('Test Pass!')
         else:
-            print('Test Fail!')
+            debug_print('Test Fail!')
 
     pass
 
