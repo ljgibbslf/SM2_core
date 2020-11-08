@@ -1,5 +1,5 @@
 SM2 算法软件示例
-作者 ：f_gibbs@163.com  OpenIC SIG 
+作者 ：lf_gibbs@163.com  OpenIC SIG 
 
 基于 github 上开源的 ECC 源代码修改整理得到
 

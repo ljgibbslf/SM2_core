@@ -199,14 +199,14 @@ end
 assign                  flg_R_lod   =   flg_AB_lod;
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_a (
+mul_64b_wrapper U_mul_64_a (
   .a(mul_64a_a), // input [63 : 0] a
   .b(mul_64a_b), // input [63 : 0] b
   .p(mul_64a_p) //  output [127 : 0] p
 );
 
 //64位 无符号数乘法 IP B
-mul_64b U_mul_64_b (
+mul_64b_wrapper U_mul_64_b (
   .a(mul_64b_a), // input [63 : 0] a
   .b(mul_64b_b), // input [63 : 0] b
   .p(mul_64b_p) //  output [127 : 0] p

@@ -392,9 +392,13 @@ def scalar_mult(k, point,jacob = 0):
             addend = point_add(addend, addend)
 
             k >>= 1
-
+    
+    
     #如使用Jacob坐标系，则进行坐标转换
     if jacob:
+        debug_print('Result(Jacob.X):(%X)'%(result[0]))
+        debug_print('Result(Jacob.Y):(%X)'%(result[1]))
+        debug_print('Result(Jacob.Z):(%X)'%(result[2]))
         result = cood_trans(result)
 
     #验证结果在曲线上，若不在则结果错误
@@ -418,8 +422,8 @@ if __name__ == "__main__":
 
     #选择 Demo
     # demo = 'SM2_MP'
-    # demo = 'SM2_MP_JACOB'
-    demo = 'SM2_MP_COM'
+    demo = 'SM2_MP_JACOB'
+    # demo = 'SM2_MP_COM'
     # demo = 'SM2_INT_TEST'
     debug_print('Select demo {}'.format(demo))
 
@@ -478,9 +482,11 @@ if __name__ == "__main__":
         result_j = None
         result_j = point_add_jacob(result_j,curve.g)#P
         result_j = point_double_jacob(result_j)#2P
+        result_j = point_add_jacob(result_j,curve.g)#3P
+        result_j = point_double_jacob(result_j)#6P
         # result_j = point_double_jacob((curve.g[0],curve.g[1],1))#
         # result_j = point_add_jacob(result_j,curve.g)#7P
-        result_j = cood_trans(result_j)
+        #result_j = cood_trans(result_j)
 
         debug_print('Run demo {}'.format(demo))
         debug_print('Result:(%X,%x)'%(result[0],result[1]))

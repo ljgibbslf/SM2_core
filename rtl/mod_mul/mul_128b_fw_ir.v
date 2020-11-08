@@ -73,28 +73,28 @@ wire [63 : 0]       mul_64d_b = mul_C;
 wire [127 : 0]      mul_64d_p;
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_a (
+mul_64b_wrapper U_mul_64_a (
   .a(mul_64a_a), // input [63 : 0] a
   .b(mul_64a_b), // input [63 : 0] b
   .p(mul_64a_p) //  output [127 : 0] p
 );
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_b (
+mul_64b_wrapper U_mul_64_b (
   .a(mul_64b_a), // input [63 : 0] a
   .b(mul_64b_b), // input [63 : 0] b
   .p(mul_64b_p) //  output [127 : 0] p
 );
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_c (
+mul_64b_wrapper U_mul_64_c (
   .a(mul_64c_a), // input [63 : 0] a
   .b(mul_64c_b), // input [63 : 0] b
   .p(mul_64c_p) //  output [127 : 0] p
 );
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_d (
+mul_64b_wrapper U_mul_64_d (
   .a(mul_64d_a), // input [63 : 0] a
   .b(mul_64d_b), // input [63 : 0] b
   .p(mul_64d_p) //  output [127 : 0] p

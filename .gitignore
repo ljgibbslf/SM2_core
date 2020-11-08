@@ -1,0 +1,6 @@
+ise/*
+xilinx_ip/*
+run/sm2_core/*
+run/work/*
+run/run_sm2_sim*
+run/*.wlf

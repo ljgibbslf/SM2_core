@@ -60,7 +60,18 @@ module tb_point_cal_top;
     reg [16*3*INS_PD_RND - 1:0]    ins_lst_reg;
     wire[16*3*INS_PD_RND - 1:0]    ins_lst_pd;
     wire[16*3*INS_PA_RND - 1:0]    ins_lst_pa;
-    wire[15:0]                      ins_null = {OP_NUL,INS_NULL,OP_NULL,OP_NULL,OP_NULL};    
+    wire[15:0]                      ins_null = {OP_NUL,INS_NULL,OP_NULL,OP_NULL,OP_NULL}; 
+
+    reg [15:0]                      ins_rnd_num; 
+
+    //随机数 k
+    wire [255:0]        k = 256'h59276E27_D506861A_16680F3A_D9C02DCC_EF3CC1FA_3CDBE4CE_6D54B80D_EAC1BC21;  
+    // wire [255:0]        k = 256'b110;  
+    reg [255:0]         k_reg;
+
+    reg [15:0]          k_shft_cntr; //k左移计数器
+
+    reg                 temp;
 
 	// Instantiate the Unit Under Test (UUT)
 	point_cal_top uut (
@@ -87,6 +98,10 @@ module tb_point_cal_top;
 		ins_vld_i = 0;
         data_path_i = 0;
         ins_lst_reg = 0;
+        ins_rnd_num = 0;
+        k_reg = 0;
+        temp = 1'b1;
+        k_shft_cntr = 16'd256;
 
 		// Wait 100 ns for global reset to finish
 		#100;
@@ -97,43 +112,20 @@ module tb_point_cal_top;
 
         //初始化寄存器
         
-        //首次倍点运算
-        ins_lst_reg = ins_lst_pd[16*3*INS_PD_RND - 1:0];
-        @(posedge clk);
-        repeat(INS_PD_RND) begin
-            push_ins;
-            wait(intr_cal_done_o)
-            @(posedge clk);
-            
-        end
+        //点乘运算
+        point_mul(); 
 
-        write_ins(OP_NUL,INS_FIN,4'd0,4'd0,4'd0);//写结束运算命令
-        @(posedge clk);
+        //k=6
+        // //首次倍点运算
+        // point_dobule(1'b1);
 
-        //后续点加运算
-        ins_lst_reg ={ins_lst_pa[16*3*INS_PA_RND - 16*3 -1:0],48'd0,96'd0};
-        @(posedge clk);
-        repeat(INS_PA_RND-1) begin
-            push_ins;
-            wait(intr_cal_done_o)
-            @(posedge clk);
-        end
+        // //后续点加运算
+        // point_add;
 
+        // //后续倍点运算
+        // point_dobule(1'b0);
 
-        write_ins(OP_NUL,INS_FIN,4'd0,4'd0,4'd0);//写结束运算命令
-        @(posedge clk);
-
-        //后续倍点运算
-        ins_lst_reg =  {ins_lst_pd[16*3*INS_PD_RND - 16*3 -1:0],48'd0};
-        @(posedge clk);
-        repeat(INS_PD_RND-1) begin
-            push_ins;
-            wait(intr_cal_done_o)
-            @(posedge clk);
-        end
-
-        write_ins(OP_NUL,INS_FIN,4'd0,4'd0,4'd0);//写结束运算命令
-        @(posedge clk);
+        // internal test
         // write_ins(OP_MUL,INS_CAL,OP_X0,OP_X0,OP_X2);//计算 x2 = x0 * x0
         // repeat(10)begin
         //     @(posedge clk);
@@ -268,7 +260,112 @@ module tb_point_cal_top;
         ins_null
     };
 
+
+    //clock inpt----------------------------------------------
     always #5 clk = ~ clk;
+
+    //tasks---------------------------------------------------
+    //task 点乘运算
+    task point_mul(); 
+    begin 
+        k_reg = k;
+        
+        //搜索k最高位第一个1'b1
+        while(~k_reg[255]) begin
+            k_reg = {k_reg[254:0],1'b0};
+            k_shft_cntr = k_shft_cntr - 1'd1;
+            @(posedge clk);
+        end
+        //搜索到1后，此时临时结果为 G
+        k_reg = {k_reg[254:0],1'b0};//TODO 当前中间结果复位为G，所以省略第一次点加运算
+        k_shft_cntr = k_shft_cntr - 1'd1;
+        @(posedge clk);
+
+        //进行剩余运算
+        while(k_shft_cntr) begin
+            //倍点运算
+            point_dobule(temp);
+
+            if(k_reg[255]) begin
+                //点加运算
+                point_add;
+            end 
+
+            k_reg = {k_reg[254:0],1'b0};
+            temp = 1'b0;
+            k_shft_cntr = k_shft_cntr - 1'd1;
+            @(posedge clk);
+        end
+
+        $display("PM Result(JACOB):\n");
+        $display("X2:%X,%X\n",var_x2_o[255-:128],var_x2_o[127-:128]);
+        $display("Y2:%X,%X\n",var_y2_o[255-:128],var_y2_o[127-:128]);
+        $display("Z2:%X,%X\n",var_z2_o[255-:128],var_z2_o[127-:128]);
+
+        k_shft_cntr = 16'd256;
+        temp = 1'b0;
+    end
+    endtask
+
+    //task 倍点运算 在非首轮倍点运算时，可省略一轮运算(round0)
+    task point_dobule(
+        input first_round
+    ); 
+    begin 
+        if(first_round)begin
+            ins_lst_reg = ins_lst_pd[16*3*INS_PD_RND - 1:0];
+            ins_rnd_num = INS_PD_RND;
+        end else begin
+            ins_lst_reg =  {ins_lst_pd[16*3*INS_PD_RND - 16*3 -1:0],48'd0};
+            ins_rnd_num = INS_PD_RND-1;
+        end
+
+        @(posedge clk);
+        repeat(ins_rnd_num) begin
+            push_ins;
+            wait(intr_cal_done_o)
+            @(posedge clk);
+            
+        end
+
+        //打印本轮输出结果
+        @(posedge clk);//需要等一拍
+
+        $display("PD Result:\n");
+        $display("X2:%X,%X\n",var_x2_o[255-:128],var_x2_o[127-:128]);
+        $display("Y2:%X,%X\n",var_y2_o[255-:128],var_y2_o[127-:128]);
+        $display("Z2:%X,%X\n",var_z2_o[255-:128],var_z2_o[127-:128]);
+
+        write_ins(OP_NUL,INS_FIN,4'd0,4'd0,4'd0);//写结束运算命令
+        @(posedge clk);
+
+    end
+    endtask
+
+    //task 点加运算 
+    task point_add(); 
+    begin
+        ins_lst_reg ={ins_lst_pa[16*3*INS_PA_RND - 16*3 -1:0],48'd0,96'd0};
+        @(posedge clk);
+
+        repeat(INS_PA_RND-1) begin
+            push_ins;
+            wait(intr_cal_done_o)
+            @(posedge clk);
+        end
+
+        //打印本轮输出结果
+        @(posedge clk);//需要等一拍
+        $display("PA Result:\n");
+        $display("X2:%X,%X\n",var_x2_o[255-:128],var_x2_o[127-:128]);
+        $display("Y2:%X,%X\n",var_y2_o[255-:128],var_y2_o[127-:128]);
+        $display("Z2:%X,%X\n",var_z2_o[255-:128],var_z2_o[127-:128]);
+
+        write_ins(OP_NUL,INS_FIN,4'd0,4'd0,4'd0);//写结束运算命令
+        @(posedge clk);
+    end
+    endtask
+
 
     //task 设置1条指令，并写入指令有效信号
     task write_ins(

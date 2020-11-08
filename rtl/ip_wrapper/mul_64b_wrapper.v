@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "sm2_cfg.v"
+`include "../inc/sm2_cfg.v" 
 //////////////////////////////////////////////////////////////////////////////////
 // Company:         OpenIC SIG
 // Engineer:        15201710458@163.com/lf_gibbs@163.com
@@ -22,29 +22,27 @@
 //                2.接口定义与 Xilinx IP 一致
 //////////////////////////////////////////////////////////////////////////////////
 module mul_64b_wrapper(
-    input [63:0]    A,
-    input [63:0]    B,
+    input [63:0]    a,
+    input [63:0]    b,
 
-    output [127:0]  P
+    output [127:0]  p
 );
 
-//定义实际 FPGA IP 的名称
-`define FPAG_IP_MODULE_NAME mul_64b
 
 `ifdef DESIGN_FPGA 
 
 	FPAG_IP_NAME U_mul_64 (
-	.A(A), // input [63 : 0] a
-	.B(B), // input [63 : 0] b
-	.P(P) //  output [127 : 0] p
+	.a(a), // input [63 : 0] a
+	.b(b), // input [63 : 0] b
+	.p(p) //  output [127 : 0] p
 	);
 
 `elsif DESIGN_SIM
 
-	mul_64b_sim_dummy U_mul_64 (
-	.A(A), // input [63 : 0] a
-	.B(B), // input [63 : 0] b
-	.P(P) //  output [127 : 0] p
+	mul_64b_sim_model U_mul_64 (
+	.a(a), // input [63 : 0] a
+	.b(b), // input [63 : 0] b
+	.p(p) //  output [127 : 0] p
 	);
 
 `endif

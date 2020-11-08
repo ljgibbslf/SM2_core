@@ -380,13 +380,13 @@ assign  var_y2_o            =   var_y2;
 assign  var_z2_o            =   var_z2;
 assign  intr_cal_done_o     =   mod_0_done || mod_1_done || mod_2_done;
 
-    always@(intr_cal_done_o)begin
-        $display("X2:%X,%X\n",var_x2[255-:128],var_x2[127-:128]);
-        $display("Y2:%X,%X\n",var_y2[255-:128],var_y2[127-:128]);
-        $display("Z2:%X,%X\n",var_z2[255-:128],var_z2[127-:128]);
-        $display("T0:%X,%X\n",var_t0[255-:128],var_t0[127-:128]);
-        $display("T1:%X,%X\n",var_t1[255-:128],var_t1[127-:128]);
-        $display("T2:%X,%X\n",var_t2[255-:128],var_t2[127-:128]);
-    end
+    // always@(intr_cal_done_o)begin
+    //     $display("X2:%X,%X\n",var_x2[255-:128],var_x2[127-:128]);
+    //     $display("Y2:%X,%X\n",var_y2[255-:128],var_y2[127-:128]);
+    //     $display("Z2:%X,%X\n",var_z2[255-:128],var_z2[127-:128]);
+    //     $display("T0:%X,%X\n",var_t0[255-:128],var_t0[127-:128]);
+    //     $display("T1:%X,%X\n",var_t1[255-:128],var_t1[127-:128]);
+    //     $display("T2:%X,%X\n",var_t2[255-:128],var_t2[127-:128]);
+    // end
 
 endmodule

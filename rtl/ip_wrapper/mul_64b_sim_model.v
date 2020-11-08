@@ -18,11 +18,11 @@
 //                仿真模型中直接使用 *，仅用于仿真验证
 //////////////////////////////////////////////////////////////////////////////////
 module mul_64b_sim_model(
-    input [63:0]    A,
-    input [63:0]    B,
+    input [63:0]    a,
+    input [63:0]    b,
 
-    output [127:0]  P
+    output [127:0]  p
 );
-	assign	P = A * B;
+	assign	p = a * b;
 
 endmodule

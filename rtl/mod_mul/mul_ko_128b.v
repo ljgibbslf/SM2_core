@@ -210,7 +210,7 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 //64位 无符号数乘法 IP
-mul_64b U_mul_64_a (
+mul_64b_wrapper U_mul_64_a (
   .a(mul_64a_a), // input [63 : 0] a
   .b(mul_64a_b), // input [63 : 0] b
   .p(mul_64a_p) //  output [127 : 0] p
