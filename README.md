@@ -1,4 +1,4 @@
-# SM3_core
+# SM2_core
 
 国密 SM2 椭圆曲线加解密算法的硬件 IP，RTL 采用 Verilog 开发。
 
@@ -6,7 +6,7 @@
 
 //TODO
 
-[SM3标准文本](http://www.gmbz.org.cn/main/viewfile/20180108023812835219.html)
+[SM2标准文本](http://www.gmbz.org.cn/main/viewfile/20180108023812835219.html)
 
 ### 功能
 
