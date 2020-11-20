@@ -209,8 +209,8 @@ def point_double_jacob(point1):
     x0, y0 ,z0= point1
     #z0 = 1
 
+    #使用公式直接计算
     zr = (2*y0*z0) % curve.p
-
     xr = ((3*x0*x0 + curve.a * z0*z0*z0*z0) * (3*x0*x0 + curve.a * z0*z0*z0*z0) - 8 * x0 * y0 *y0) % curve.p
     yr = ((3*x0*x0 + curve.a * z0*z0*z0*z0) * (4*x0*y0*y0 - xr) - 8*y0*y0*y0*y0) % curve.p
     t1 = (zr * zr) % curve.p
@@ -218,62 +218,65 @@ def point_double_jacob(point1):
     # xr = xr * inverse_mod(t1, curve.p)% curve.p
     # yr = yr * inverse_mod(t2, curve.p)% curve.p
 
-    #step
+    #用于 a = p-3 的分步计算步骤
+    if curve.a == curve.p - 3: 
 
-    t1 = z0*z0 % curve.p#z0^2
+        t1 = z0*z0 % curve.p#z0^2
 
-    x1 = (x0 - t1) % curve.p#x0 -  z0*z0
-    y1 = (x0 + t1) % curve.p#x0 +  z0*z0
-    debug_print('x1=%x\n'%x1)
-    debug_print('y1=%x\n'%y1)
+        x1 = (x0 - t1) % curve.p#x0 -  z0*z0
+        y1 = (x0 + t1) % curve.p#x0 +  z0*z0
+        debug_print('x1=%x\n'%x1)
+        debug_print('y1=%x\n'%y1)
 
-    y1 = (y1 * x1) % curve.p#(x0 - z0*z0)(x0 + z0*z0)
-    t0 = (y0 * y0) % curve.p#y0 * y0
-    z1 = (y0 * z0) % curve.p#y0z0
-    debug_print('y1=%x\n'%y1)
-    debug_print('t0=%x\n'%t0)
-    debug_print('z1=%x\n'%z1)
+        y1 = (y1 * x1) % curve.p#(x0 - z0*z0)(x0 + z0*z0)
+        t0 = (y0 * y0) % curve.p#y0 * y0
+        z1 = (y0 * z0) % curve.p#y0z0
+        debug_print('y1=%x\n'%y1)
+        debug_print('t0=%x\n'%t0)
+        debug_print('z1=%x\n'%z1)
 
-    t0 = (t0 + t0) % curve.p#2y0^2
-    t2 = (y1 + y1) % curve.p#2(x0 - z0*z0)(x0 + z0*z0)
-    debug_print('t0=%x\n'%t0)
-    debug_print('t2=%x\n'%t2)
+        t0 = (t0 + t0) % curve.p#2y0^2
+        t2 = (y1 + y1) % curve.p#2(x0 - z0*z0)(x0 + z0*z0)
+        debug_print('t0=%x\n'%t0)
+        debug_print('t2=%x\n'%t2)
 
-    z1 = (z1 + z1) % curve.p#z=2y0z0
-    y1 = (y1 + t2) % curve.p#3(x0 - z0*z0)(x0 + z0*z0)
-    debug_print('z1=%x\n'%z1)
-    debug_print('y1=%x\n'%y1)
+        z1 = (z1 + z1) % curve.p#z=2y0z0
+        y1 = (y1 + t2) % curve.p#3(x0 - z0*z0)(x0 + z0*z0)
+        debug_print('z1=%x\n'%z1)
+        debug_print('y1=%x\n'%y1)
 
-    t2 = (y1 * y1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2
-    t1 = (t0 * t0) % curve.p#4y0^4
-    t0 = (t0 * x0) % curve.p#2y0^2 ·x0
-    debug_print('t2=%x\n'%t2)
-    debug_print('t1=%x\n'%t1)
-    debug_print('t0=%x\n'%t0)
+        t2 = (y1 * y1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2
+        t1 = (t0 * t0) % curve.p#4y0^4
+        t0 = (t0 * x0) % curve.p#2y0^2 ·x0
+        debug_print('t2=%x\n'%t2)
+        debug_print('t1=%x\n'%t1)
+        debug_print('t0=%x\n'%t0)
 
-    t0 = (t0 + t0) % curve.p#4y0^2 ·x0
-    debug_print('t0=%x\n'%t0)
-    x1 = (t0 + t0) % curve.p#8y0^2 ·x0
-    debug_print('x1=%x\n'%x1)
-    x1 = (t2 - x1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
-    debug_print('x1=%x\n'%x1)
+        t0 = (t0 + t0) % curve.p#4y0^2 ·x0
+        debug_print('t0=%x\n'%t0)
+        x1 = (t0 + t0) % curve.p#8y0^2 ·x0
+        debug_print('x1=%x\n'%x1)
+        x1 = (t2 - x1) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
+        debug_print('x1=%x\n'%x1)
 
-    t1 = (t1 + t1) % curve.p#8y0^4
-    t0 = (t0 - x1) % curve.p#4y0^2 ·x0 - (3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
-    debug_print('t1=%x\n'%t1)
-    debug_print('t0=%x\n'%t0)
+        t1 = (t1 + t1) % curve.p#8y0^4
+        t0 = (t0 - x1) % curve.p#4y0^2 ·x0 - (3(x0 - z0*z0)(x0 + z0*z0))^2 - 8y0^2 ·x0
+        debug_print('t1=%x\n'%t1)
+        debug_print('t0=%x\n'%t0)
 
-    y1 = (y1 * t0) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1)
-    debug_print('y1=%x\n'%y1)
-    y1 = (y1 - t1) % curve.p# (3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1) - 8y0^4
-    debug_print('y1=%x\n'%y1)
+        y1 = (y1 * t0) % curve.p#(3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1)
+        debug_print('y1=%x\n'%y1)
+        y1 = (y1 - t1) % curve.p# (3(x0 - z0*z0)(x0 + z0*z0))(4y0^2 ·x0 - x1) - 8y0^4
+        debug_print('y1=%x\n'%y1)
 
-    t1 = z1*z1 % curve.p
-    debug_print('t1=%x\n'%t1)
-    t2 = t1*z1 % curve.p
-    debug_print('t2=%x\n'%t2)
+        t1 = z1*z1 % curve.p
+        debug_print('t1=%x\n'%t1)
+        t2 = t1*z1 % curve.p
+        debug_print('t2=%x\n'%t2)
 
-    return (x1,y1,z1)
+        return (x1,y1,z1)
+    else:
+        return (xr,yr,zr)
 
 def point_add_jacob(point1_jacob,point2):
     ''' 雅各比-仿射混合坐标 点加运算
@@ -298,7 +301,7 @@ def point_add_jacob(point1_jacob,point2):
     #临时变量
     (t0,t1,t2) = (0,0,0)
 
-    #refer
+    #使用公式直接计算
     Ar = ( x1 * (z0**2) - x0 ) % curve.p
     Br = ( y1 * (z0**3) - y0 ) % curve.p
     xr = ( Br**2 - Ar**3 - 2*x0*Ar**2 ) % curve.p
@@ -307,6 +310,7 @@ def point_add_jacob(point1_jacob,point2):
 
     #(x2,y2,z2) = (xr,yr,zr)
 
+    #分步计算
     t2 = z0 * z0 % curve.p # z0^2
     t0 = z0 * y1 % curve.p # z0y1
     debug_print('t2=%x\n'%t2)
